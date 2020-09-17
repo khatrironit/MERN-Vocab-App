@@ -1,5 +1,7 @@
 const request = require('request');
- 
+const mongoose = require('mongoose')
+const Dictionary = require('../models/dictionary');
+const { Mongoose } = require('mongoose');
 
 const callExternalApiUsingRequest = (word,callback) => {
   _EXTERNAL_URL = 'https://od-api.oxforddictionaries.com/api/v2/entries/en-gb/' + word
@@ -17,7 +19,16 @@ const callExternalApiUsingRequest = (word,callback) => {
     if (err) { 
         return callback(err);
      }
-    return callback(body);
+    const data = JSON.parse(body)
+    const dictionary = new Dictionary({
+      _id : new mongoose.Types.ObjectId(),
+      word : data.id,
+      type : data.results[0].lexicalEntries[0].lexicalCategory.text,
+      definition : data.results[0].lexicalEntries[0].entries[0].senses[0].definitions[0],
+      example : data.results[0].lexicalEntries[0].entries[0].senses[0].examples[0].text 
+    })
+    dictionary.save().then(res=>console.log("success",res)).catch(err=>console.log(err))
+    return callback("success");
     });
 }
 

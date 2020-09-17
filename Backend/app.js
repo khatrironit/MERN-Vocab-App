@@ -29,7 +29,7 @@ app.use((req,res,next)=>{
     next()
 })
 //Route to handle api requests.
-app.use('/',vocabRoute)
+app.use('/home',vocabRoute)
 app.use('/add',addWordRoute)
 //middleware to handle api requests to invalid routes.
 app.use((req,res,next)=>{
