@@ -17,15 +17,19 @@ const callExternalApiUsingRequest = (word,callback) => {
   }
     request(options, (err, res, body) => {
     if (err) { 
+        console.log("errrrrrrr")
         return callback(err);
      }
     const data = JSON.parse(body)
+    if(data.error){
+      return callback("No entry found")
+    }
     const dictionary = new Dictionary({
       _id : new mongoose.Types.ObjectId(),
       word : data.id,
       type : data.results[0].lexicalEntries[0].lexicalCategory.text,
       definition : data.results[0].lexicalEntries[0].entries[0].senses[0].definitions[0],
-      example : data.results[0].lexicalEntries[0].entries[0].senses[0].examples[0].text 
+      example : data.results[0].lexicalEntries[0].entries[0].senses[0].examples ?data.results[0].lexicalEntries[0].entries[0].senses[0].examples[0].text :  "not found"
     })
     dictionary.save().then(res=>console.log("success",res)).catch(err=>console.log(err))
     return callback("success");

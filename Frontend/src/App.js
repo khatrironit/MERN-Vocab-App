@@ -20,62 +20,15 @@ export default class App extends Component {
       showDialogBox : false,
       word : "",
       error : "",
+      isLoading : false
     }
   }
-  async componentDidMount(){
-    const url = "http://localhost:5000/home"
-    await axios.get(url).then(res=>{
-      console.log(res)
-      this.setState({dictionary : res.data})
-    }).catch(err=>{
-      console.log(err)
-    })
+  componentDidMount(){
+    this.fetchWords()
   }
-  toggleSearch = () => {
-    this.setState((prevState)=>({searchvisible : !prevState.searchvisible}))
-  }
-  setInputValue = (event,key) => {
-    this.setState({ [key]: event.target.value });
-  }
-  addWord = () => {
-    this.setState({ showDialogBox: true });
-  }
-  validateForm = () => {
-    if(this.state.word === ""){
-      this.setState({error : "Please Enter a Word"})
-    }else{
-      this.searchApi();
-    }
-  }
-  searchApi = async () => {
-    const { word } = this.state
 
-
-    const url = "http://localhost:5000/add/" + word
-    
-     await axios.post(url,{}).then(res => {
-      console.log(res.data)
-      if(res.data!=="success"){
-        this.setState({error : "Something Went Wrong. Please Try Again"})
-      }else{
-        this.setState({ showDialogBox: false });
-      }
-    }).catch(err=>this.setState({error : "Something Went Wrong. Please Try Again"}))
-  }
-  renderWordCards = () => {
-    const { dictionary, searchInput } = this.state
-
-    const filteredwords = dictionary.filter(
-      (word) => {
-        if(word.word !== undefined)
-          return word.word.indexOf(searchInput) !== -1 ;
-      }
-    )
-    return filteredwords.map((data,index)=><WordCard key = { index } data = { data } />)
-
-  }
   render() {
-    const { searchvisible, dictionary } = this.state
+    const { searchvisible, dictionary, isLoading } = this.state
     return (
       <div className="App">
        <Container className = "topbar" fluid>
@@ -102,28 +55,31 @@ export default class App extends Component {
           </Row>
           <br />
           <Row>
+            {dictionary.length === 0? <h4>Loading...</h4> : ""}
             {this.renderWordCards()}
                 {/* {dictionary.length > 0 ? dictionary.map((data,index)=><WordCard key = {index} data = {data} />) : null} */}
           </Row>
        </Container>
 
+      
        <Modal 
-            size="md"
+            className = "modal"
             show={this.state.showDialogBox} 
             animation={false} 
             onHide={()=>this.setState({ showDialogBox: false })}
             aria-labelledby="example-modal-sizes-title-lg"
         >
             <Modal.Header closeButton>
-                <Modal.Title>Add New Word</Modal.Title>
+                <Modal.Title><h4>Add New Word</h4></Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
                 <Row>
                     <Col>
                         <Form.Group>
-                            <Form.Label>Word *</Form.Label>
+                            <Form.Label><p>Word *</p></Form.Label>
                             <Form.Control 
+                                className = "modal-input"
                                 type="text" 
                                 placeholder="Enter New Word..."
                                 value={this.state.name}
@@ -143,7 +99,7 @@ export default class App extends Component {
                     :
                     <Row className="text-center mt-1 mb-1 d-flex justify-content-center">
                         <Col>
-                            Fields marked * are mandatory
+                            <p>Fields marked * are mandatory</p>
                         </Col>
                     </Row>
                 }
@@ -155,16 +111,17 @@ export default class App extends Component {
                     className="pt-2 pb-2" 
                     variant="primary"
                     onClick={()=>this.validateForm()}
+                    className = "modal-button"
                 >
-                    Add
+                    {isLoading ? "Loading..." : "Add"}
                 </Button>
             </Modal.Footer>
         </Modal>
 
        <Fab.Container>
                     <Fab.Button
-                        styles={{backgroundColor: '#5c1349', color: Fab.lightColors.white, width: 60, height: 60 }}
-                        tooltip="Add New CV"
+                        styles={{backgroundColor: '#5c1349', color: Fab.lightColors.white, width: 30, height: 30 }}
+                        tooltip="Add New Word"
                         icon="fa fa-plus"
                         onClick={()=>this.addWord()}
                         className="btn-block z-depth-1a"
@@ -172,5 +129,64 @@ export default class App extends Component {
                 </Fab.Container>
       </div>
     )
+  }
+
+  //methods..
+
+  fetchWords = async () => {
+    this.setState({isLoading:true})
+    const url = "http://localhost:5000/home"
+    //api call to fetch words from database
+    await axios.get(url).then(res=>{
+      console.log(res)
+      this.setState({dictionary : res.data,isLoading:false})
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
+  toggleSearch = () => {
+    this.setState((prevState)=>({searchvisible : !prevState.searchvisible}))
+    this.setState({searchInput:""})
+  }
+  setInputValue = (event,key) => {
+    this.setState({ [key]: event.target.value });
+  }
+  addWord = () => {
+    this.setState({ showDialogBox: true });
+  }
+  validateForm = () => {
+    if(this.state.word === ""){
+      this.setState({error : "Please Enter a Word"})
+    }else{
+      this.searchApi();
+    }
+  }
+  searchApi = async () => {
+    const { word } = this.state
+    this.setState({isLoading:true})
+
+    const url = "http://localhost:5000/add/" + word
+    //api call to add a new word in database
+     await axios.get(url).then(res => {
+      console.log(res.data)
+      if(res.data!=="success"){
+        this.setState({error : "No Entry Found"})
+      }else{
+        this.setState({ showDialogBox: false,isLoading:false });
+        this.fetchWords()
+      }
+    }).catch(err=>this.setState({error : "Something Went Wrong. Please Try Again"}))
+  }
+  renderWordCards = () => {
+    const { dictionary, searchInput } = this.state
+
+    const filteredwords = dictionary.filter(
+      (word) => {
+        if(word.word !== undefined)
+          return word.word.indexOf(searchInput.toLocaleLowerCase()) !== -1 ;
+      }
+    )
+    return filteredwords.map((data,index)=><WordCard key = { index } data = { data } />)
+
   }
 }

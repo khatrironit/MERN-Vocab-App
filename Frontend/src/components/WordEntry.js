@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Button, Modal,Container, Row, Col} from 'react-bootstrap';
+import {Container, Row, Col} from 'react-bootstrap';
 import '../App.css'
 
 export default class WordEntry extends Component {
@@ -19,7 +19,7 @@ export default class WordEntry extends Component {
                     <Col>
                         {data.entries ? data.entries[0].senses.map((sense,index)=>{
                             return <>
-                            {sense.definitions ? sense.definitions.map((def,j) => <h6 key = {j}>{def}</h6> ) : ""}
+                            {sense.definitions ? sense.definitions.map((def,j) => <p key = {j}><strong>{def}</strong></p> ) : ""}
                             <ul>
                                 {sense.examples ? sense.examples.map((example,i)=><li key ={i} >{example.text}</li>) : ""}
                             </ul>
@@ -28,10 +28,10 @@ export default class WordEntry extends Component {
                     </Col>
                 </Row>
                 {data.derivatives?<Row>
-                                        <Col>                        
-                                            <p >(Derivatives)  {data.derivatives.map((w,k)=>(w.text+","))}</p>                        
-                                        </Col>
-                                    </Row> :""}
+                                <Col>                        
+                                    <p >(Derivatives)  {data.derivatives.map((w,k)=>(w.text+","))}</p>                        
+                                </Col>
+                            </Row> :""}
             </Container>
         )
     }

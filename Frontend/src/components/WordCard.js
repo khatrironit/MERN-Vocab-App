@@ -13,6 +13,7 @@ export default class WordCard extends Component {
     fetchDetails = async () => {
         this.setState({detailsBox:true})
         const url = "http://localhost:5000/home/"+this.props.data.word
+        //api call to fetch word details
         await axios.get(url).then(res=>{
             console.log(res.data.results[0].lexicalEntries)
             this.setState({wordDetails : res.data.results[0].lexicalEntries})
@@ -26,9 +27,9 @@ export default class WordCard extends Component {
         const { wordDetails } = this.state
         return (
             <>
-            <Col xl = {5}  lg = {6} md = {6} sm = {12} xs = {12} onClick = {this.fetchDetails} className = "word-card">
+            <Col xl = {5}  lg = {5} md = {5} sm = {10} xs = {10} onClick = {this.fetchDetails} className = "word-card">
                 <Row>
-                    <Col><h2 >{data.word}</h2></Col>
+                    <Col><h4 >{data.word}</h4></Col>
                 </Row>
                 <Row>
                     <Col><p>({data.type}){data.definition}</p></Col>
@@ -38,7 +39,7 @@ export default class WordCard extends Component {
                 </Row>
             </Col>
                    <Modal 
-                   size="md"
+                   
                    show={this.state.detailsBox} 
                    animation={false} 
                    onHide={()=>this.setState({ detailsBox: false })}
