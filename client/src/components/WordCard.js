@@ -12,7 +12,7 @@ export default class WordCard extends Component {
     }
     fetchDetails = async () => {
         this.setState({detailsBox:true})
-        const url = "http://localhost:5000/home/"+this.props.data.word
+        const url = '/home/'+this.props.data.word
         //api call to fetch word details
         await axios.get(url).then(res=>{
             console.log(res.data.results[0].lexicalEntries)

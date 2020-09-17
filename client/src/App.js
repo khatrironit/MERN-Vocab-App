@@ -135,7 +135,7 @@ export default class App extends Component {
 
   fetchWords = async () => {
     this.setState({isLoading:true})
-    const url = "http://localhost:5000/home"
+    const url = '/home'
     //api call to fetch words from database
     await axios.get(url).then(res=>{
       console.log(res)
@@ -165,7 +165,7 @@ export default class App extends Component {
     const { word } = this.state
     this.setState({isLoading:true})
 
-    const url = "http://localhost:5000/add/" + word
+    const url = '/add/' + word
     //api call to add a new word in database
      await axios.get(url).then(res => {
       console.log(res.data)

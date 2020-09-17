@@ -31,7 +31,7 @@ const callExternalApiUsingRequest = (word,callback) => {
       definition : data.results[0].lexicalEntries[0].entries[0].senses[0].definitions[0],
       example : data.results[0].lexicalEntries[0].entries[0].senses[0].examples ?data.results[0].lexicalEntries[0].entries[0].senses[0].examples[0].text :  "not found"
     })
-    dictionary.save().then(res=>console.log("success",res)).catch(err=>console.log(err))
+    // dictionary.save().then(res=>console.log("success",res)).catch(err=>console.log(err))
     return callback("success");
     });
 }

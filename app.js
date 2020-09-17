@@ -16,6 +16,11 @@ app.use(logger('dev'))
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
 
+
+if(process.env.NODE_ENV === 'production'){
+    app.use(express.static('client/build'));
+}
+
 //handling cors error
 
 app.use((req,res,next)=>{
@@ -29,8 +34,9 @@ app.use((req,res,next)=>{
     next()
 })
 //Route to handle api requests.
-app.use('/home',vocabRoute)
 app.use('/add',addWordRoute)
+app.use('/home',vocabRoute)
+
 //middleware to handle api requests to invalid routes.
 app.use((req,res,next)=>{
     const error = new Error('Page Not Found!!')
