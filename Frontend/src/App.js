@@ -7,16 +7,29 @@ import 'font-awesome/css/font-awesome.min.css';
 import './App.css';
 import axios from 'axios'
 
+import WordCard from './components/WordCard'
+
 
 export default class App extends Component {
   constructor(){
     super()
     this.state = {
+      dictionary : [],
       searchvisible : false,
       searchInput : "",
       showDialogBox : false,
       word : "",
+      error : "",
     }
+  }
+  async componentDidMount(){
+    const url = "http://localhost:5000/home"
+    await axios.get(url).then(res=>{
+      console.log(res)
+      this.setState({dictionary : res.data})
+    }).catch(err=>{
+      console.log(err)
+    })
   }
   toggleSearch = () => {
     this.setState((prevState)=>({searchvisible : !prevState.searchvisible}))
@@ -40,12 +53,29 @@ export default class App extends Component {
 
     const url = "http://localhost:5000/add/" + word
     
-    axios.get(url).then(res => {
-      console.log(JSON.parse(res.data))
-    }).catch(err=>console.log(err))
+     await axios.post(url,{}).then(res => {
+      console.log(res.data)
+      if(res.data!=="success"){
+        this.setState({error : "Something Went Wrong. Please Try Again"})
+      }else{
+        this.setState({ showDialogBox: false });
+      }
+    }).catch(err=>this.setState({error : "Something Went Wrong. Please Try Again"}))
+  }
+  renderWordCards = () => {
+    const { dictionary, searchInput } = this.state
+
+    const filteredwords = dictionary.filter(
+      (word) => {
+        if(word.word !== undefined)
+          return word.word.indexOf(searchInput) !== -1 ;
+      }
+    )
+    return filteredwords.map((data,index)=><WordCard key = { index } data = { data } />)
+
   }
   render() {
-    const { searchvisible } = this.state
+    const { searchvisible, dictionary } = this.state
     return (
       <div className="App">
        <Container className = "topbar" fluid>
@@ -70,8 +100,10 @@ export default class App extends Component {
                 <p className = "sub-title">Words List</p>
             </Col>
           </Row>
+          <br />
           <Row>
-
+            {this.renderWordCards()}
+                {/* {dictionary.length > 0 ? dictionary.map((data,index)=><WordCard key = {index} data = {data} />) : null} */}
           </Row>
        </Container>
 
